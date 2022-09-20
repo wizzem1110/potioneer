@@ -4,13 +4,14 @@ namespace Potioneer
 {
     public enum Trait
     {
+        Water,
         Healing,
         Poisonous,
         Cleansing,
         Dizzying,
         Warming,
-        Cooling,
-        Gold
+        Cooling
+        //some placeholders here
     }
 
     public class Ingredient
@@ -23,35 +24,35 @@ namespace Potioneer
             Amount = a;
         }
 
-        public void Increase(double x)
+        public Ingredient(Ingredient ing)
         {
-            Amount += x;
+            Trait = ing.Trait;
+            Amount = ing.Amount;
         }
 
-        public void Print()
-        {
-            Console.WriteLine($"{Trait}, {Amount:0.00}");
-        }
+        public void Increase(double x) => Amount += x;
+
+        public void Print() => Console.WriteLine($"{Trait}, {Amount:0.00}");
     }
 
     public class Herb
     {
+        private static readonly Random rng = new();
         public string Name { get; }
-        public Ingredient Main { get; }
+        public Ingredient Primary { get; }
         public Ingredient Secondary { get; }
         public Ingredient Terciary { get; }
-        public Herb(string name, Trait main, double mainAmount, Trait sec, double secAmount)
+        public Herb(string name, Trait main, Trait sec)
         {
             Name = name;
-            Main = new Ingredient(main, mainAmount);
-            Secondary = new Ingredient(sec, secAmount);
-            Terciary = new Ingredient(Trait.Gold, 1 - (mainAmount + secAmount));
+            var mainAmount = 0.25 + rng.NextDouble() * 0.25;
+            var secAmount = 0.25 - rng.NextDouble() * 0.25;
+            Primary = new Ingredient(main, Math.Round(mainAmount, 2));
+            Secondary = new Ingredient(sec, Math.Round(secAmount, 2));
+            Terciary = new Ingredient(Trait.Water, 1 - (mainAmount + secAmount));
         }
-        public void Print()
-        {
-            Console.WriteLine($"\t{Name}");
-            //Console.WriteLine($"{Name}, {Main.Trait}");
-        }
+
+        public void Print() => Console.WriteLine($"- {Name}");
     }
 
     public class Potion
@@ -67,12 +68,18 @@ namespace Potioneer
 
         public void MixHerb(Herb herb)
         {
-            HerbsList.Add(herb);
-            Add(herb.Main);
-            Add(herb.Secondary);
-            Add(herb.Terciary);
+            if (herb == null)
+                Program.WriteLineColored("Unidentified herb", ConsoleColor.Red);
+            
+            else
+            {
+                HerbsList.Add(herb);
+                Add(herb.Primary);
+                Add(herb.Secondary);
+                Add(herb.Terciary);
+            }
         }
-        
+
         private void Add(Ingredient herbIng)
         {
             foreach (var ing in Ingredients)
@@ -83,114 +90,165 @@ namespace Potioneer
                     return;
                 }
             }
-            Ingredients.Add(herbIng);
+            Ingredients.Add(new Ingredient(herbIng));
         }
 
-        public int HerbsCount
+        public int HerbsCount => HerbsList.Count;
+
+        public bool IsValid()
         {
-            get => HerbsList.Count();
+            var sum = 0.0;
+            foreach (var ing in Ingredients)
+            {
+                if (ing.Trait != Trait.Water)
+                {
+                    sum += ing.Amount;
+                }
+            }
+            foreach (var ing in Ingredients)
+            {
+                if (ing.Trait != Trait.Water && ing.Amount / sum > 0.5)
+                {
+                    Program.WriteLineColored($"You have found {ing.Trait} potion!", ConsoleColor.Magenta);
+                    return true;
+                }
+            }
+            Program.WriteLineColored("You found an invalid potion", ConsoleColor.Red);
+            return false;
         }
 
         public void Print()
         {
             foreach (var herb in HerbsList)
-            {
                 herb.Print();
-            }
             Console.WriteLine();
             foreach (var ing in Ingredients)
+                if (ing.Trait != Trait.Water) ing.Print();
+        }
+    }
+
+    public class Game
+    {
+        public List<Herb> HerbsList { get; }
+        public List<Potion> ValidPotionList { get; }
+        public Game()
+        {
+            HerbsList = new()
             {
-                ing.Print();
-            }
+                new Herb("belladonna",  (Trait)2, (Trait)4),
+                new Herb("daffodil",    (Trait)1, (Trait)4),
+                new Herb("dahlia",      (Trait)1, (Trait)2),
+                new Herb("mandrake",    (Trait)2, (Trait)1),
+                new Herb("thistle",     (Trait)3, (Trait)4),
+                new Herb("wolfsbane",   (Trait)2, (Trait)3),
+            };
+
+            ValidPotionList = new();
         }
     }
 
     public class Program
     {
-        static void WriteLineColored(string line, ConsoleColor color)
+        private static Game game;
+        private static readonly Random rng = new();
+        private static readonly string quitCommand = "quit";
+        private static readonly string helpCommand = "help";
+        private static readonly string clearCommand = "clear";
+        private static readonly string defaultHerbCommand = "q";
+
+        public static void WriteLineColored(string line, ConsoleColor color)
         {
             Console.ForegroundColor = color;
             Console.WriteLine(line);
             Console.ResetColor();
         }
 
-        static List<Herb> Initialize()
+        private static Herb StringToHerb(string query)
         {
-            var herbs = new List<Herb>
-            {
-                new Herb("belladonna", Trait.Poisonous, 0.40, Trait.Dizzying, 0.50),
-                new Herb("daffodil", Trait.Healing, 0.60, Trait.Dizzying, 0.20),
-                new Herb("dahlia", Trait.Healing, 0.30, Trait.Poisonous, 0.30),
-                new Herb("mandrake", Trait.Poisonous, 0.90, Trait.Healing, 0.05),
-                new Herb("thistle", Trait.Cleansing, 0.50, Trait.Dizzying, 0.15),
-                new Herb("wolfsbane", Trait.Poisonous, 0.80, Trait.Cleansing, 0.15)
-                //To add:
-                //goatweed, poppy, hemp, hop
-                //mint, melissa, rosehip, thyme
-                //lily-of-the-valley, nettles
-            };
-            return herbs;
-        }
-
-        static void MixTo(string query, List<Herb> herbs, Potion potion)
-        {
-            foreach (var herb in herbs)
+            if (query == defaultHerbCommand)
+                return game.HerbsList[rng.Next(game.HerbsList.Count)];
+            foreach (var herb in game.HerbsList)
             {
                 if (query == herb.Name)
                 {
-                    potion.MixHerb(herb);
-                    return;
+                    return herb;
                 }
             }
-            WriteLineColored("Unidentified herb, try something else", ConsoleColor.Red);
+            return null;
+        }
+
+        static void PrintHelp()
+        {
+            Console.WriteLine();
+            Console.WriteLine("Available herbs:");
+            foreach (var herb in game.HerbsList)
+                herb.Print();
+            Console.WriteLine();
+        }
+
+        static bool? QueryProcessing(string query)
+        {
+            if (query is null) return false;
+            if (query == quitCommand) return null;
+            if (query == clearCommand)
+            {
+                Console.Clear();
+                return false;
+            }
+            if (query == helpCommand)
+            {
+                PrintHelp();
+                return false;
+            }
+            return true;
         }
 
         static void Main()
         {
+            game = new Game();
+
             while (true)
             {
                 var newGameFlag = false;
                 Console.Clear();
                 Console.WriteLine("Welcome!");
-                var herbs = Initialize();
                 var potion = new Potion();
+
                 while (potion.HerbsCount < 3)
                 {
                     WriteLineColored("Enter ingredient name:", ConsoleColor.Yellow);
                     var query = Console.ReadLine();
-                    if (query == "help")    //should be printed at the start
-                    {
-                        Console.WriteLine("Available herbs:");
-                        foreach (var herb in herbs)
-                            herb.Print();
-                        Console.WriteLine();
-                        query = Console.ReadLine();
-                    }
-                    if (query == "q" || query is null)
-                        query = herbs[potion.HerbsCount].Name;
-                    MixTo(query, herbs, potion);
+                    var result = QueryProcessing(query);
+
+                    if (result == false) continue;
+                    if (result == null) return;
+
+                    var herb = StringToHerb(query);
+                    potion.MixHerb(herb);
                 }
 
-                WriteLineColored("All 3 herbs successfully added, here they are:", ConsoleColor.Green);
-                potion.Print();
+                Console.WriteLine();
+                if (potion.IsValid())
+                {
+                    Console.WriteLine();
+                    WriteLineColored("Potion is ready, here is what inside:", ConsoleColor.Green);
+                    potion.Print();
+                }
+                Console.WriteLine();
 
                 while (!newGameFlag)
                 {
-                    Console.WriteLine("Want to play again? y/n");
-                    var decision = Console.ReadLine();
-                    if (decision == "n")
+                    Console.WriteLine("Press ENTER to start again\nEnter \"{0}\" to exit", quitCommand);
+
+                    if (QueryProcessing(Console.ReadLine()) == null)
                     {
                         break;
                     }
-                    else if (decision == "y")
+
+                    else
                     {
                         newGameFlag = true;
                         continue;
-                    }
-                    else
-                    {
-                        //Console.Clear();
-                        Console.WriteLine("Unknown command");
                     }
                 }
 
