@@ -244,7 +244,6 @@ namespace Potioneer
                     {
                         break;
                     }
-
                     else
                     {
                         newGameFlag = true;
