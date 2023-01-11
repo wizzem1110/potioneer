@@ -13,8 +13,8 @@ namespace PotioneerG
 {
     public partial class PotioneerForm : Form
     {
-        static Size bSize = new Size(100, 20);
-        static Size fSize = new Size(640, 480);
+        static Size bSize = new(100, 20);
+        static Size fSize = new(640, 480);
 
         const int indent = 80;
 
@@ -33,8 +33,8 @@ namespace PotioneerG
             BorderStyle = BorderStyle.FixedSingle,
         };
 
-        readonly Action<Label> UpdateOutput = (x) => x.Text = text;
-        readonly List<Button> Buttons = new List<Button>();
+        readonly Action<Label> UpdateOutput = x => x.Text = text;
+        readonly List<Button> Buttons = new();
 
         public PotioneerForm()
         {

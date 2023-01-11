@@ -1,6 +1,0 @@
-﻿belladonna  poisonous   dizzying
-daffodil    healing		dizzying
-dahlia		healing		poisonous
-mandrake	poisonous	healing
-thistle		cleansing	dizzying
-wolfsbane	poisonous	cleansing
