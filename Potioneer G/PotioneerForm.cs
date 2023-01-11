@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using PotioneerG;
 using PotioneerL;
 
 namespace PotioneerG
@@ -35,8 +34,7 @@ namespace PotioneerG
         };
 
         readonly Action<Label> UpdateOutput = (x) => x.Text = text;
-
-        List<Button> Buttons = new List<Button>();
+        readonly List<Button> Buttons = new List<Button>();
 
         public PotioneerForm()
         {
@@ -119,6 +117,8 @@ namespace PotioneerG
                 TextAlign = ContentAlignment.MiddleLeft
             };
 
+            this.flowLayoutPanel1.FlowDirection = FlowDirection.TopDown;
+
             Controls.Add(output);
             Controls.Add(resetButton);
             Controls.Add(helpButton);
@@ -127,7 +127,13 @@ namespace PotioneerG
             Controls.Add(mixButton);
             Controls.Add(ngButton);
 
-            helpButton.Click += (s, e) => new HelpForm().ShowDialog();
+            var help = new HelpForm();
+            helpButton.Click += (s, e) =>
+            {
+                var a = help.IsDisposed ? help = new HelpForm() : help;
+                a.Show();
+                a.Focus();
+            };
 
             ngButton.Click += (s, e) =>
             {

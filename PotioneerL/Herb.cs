@@ -19,6 +19,6 @@ namespace PotioneerL
             Terciary = new Ingredient(Trait.Water, 1 - (mainAmount + secAmount));
         }
 
-        public override string ToString() => $"{Name}";
+        public override string ToString() => Name;
     }
 }

@@ -2,7 +2,7 @@
 {
     public enum Trait
     {
-        Cleanse = - 5,
+        Cleanse = -5,
         Warmth = -4,
         Healing = -3,
         Animating = -2,

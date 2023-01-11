@@ -28,7 +28,7 @@ namespace PotioneerL
         {
             foreach (var ing in Ingredients)
             {
-                if (ing.Trait != 0 && (int)ing.Trait == -(int)herbIng.Trait)
+                if (ing.Trait != 0 && (int)ing.Trait == -(int)herbIng.Trait) //Ingredients.Contains(-(int)herbIng.Trait) ??
                 {
                     Add(new Ingredient(0, ing.Amount + herbIng.Amount));
                     Ingredients.Remove(ing);
@@ -64,7 +64,7 @@ namespace PotioneerL
                 return inv;
 
             var trait = Ingredients
-                .Where(x => Math.Abs(x.Amount - Ingredients.Select(y => y.Amount).Max()) < 10e-3)
+                .Where(x => Math.Abs(x.Amount - Ingredients.Max(y => y.Amount)) < 10e-3)
                 .Select(x => x.Trait)
                 .FirstOrDefault();
 
