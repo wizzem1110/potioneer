@@ -1,4 +1,4 @@
-﻿namespace PotioneerG
+﻿namespace Poti
 {
     partial class HelpForm
     {

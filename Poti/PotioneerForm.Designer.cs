@@ -1,4 +1,4 @@
-﻿namespace PotioneerG
+﻿namespace Poti
 {
     partial class PotioneerForm
     {
@@ -20,7 +20,8 @@
             base.Dispose(disposing);
         }
 
-        #region Код, автоматически созданный конструктором форм Windows
+        /*
+        #region Код, автоматически созданный конструктором форм Windows*/
 
         /// <summary>
         /// Требуемый метод для поддержки конструктора — не изменяйте 
@@ -28,7 +29,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            /*this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.flowLayoutPanel1.SuspendLayout();
@@ -36,8 +37,8 @@
             // 
             // flowLayoutPanel1
             // 
-            this.flowLayoutPanel1.Controls.Add(this.button1);
-            this.flowLayoutPanel1.Controls.Add(this.button2);
+            //this.flowLayoutPanel1.Controls.Add(this.button1);
+            //this.flowLayoutPanel1.Controls.Add(this.button2);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Right;
             this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(572, 0);
@@ -72,15 +73,15 @@
             this.Name = "PotioneerForm";
             this.Text = "Form1";
             this.flowLayoutPanel1.ResumeLayout(false);
-            this.ResumeLayout(false);
+            this.ResumeLayout(false);*/
 
         }
 
-        #endregion
+        /*#endregion
 
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button2;*/
     }
 }
 

@@ -1,25 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿namespace Poti;
 
-namespace PotioneerG
+internal static class PotioneerMain
 {
-    internal static class PotioneerMain
+    /// <summary>
+    ///     Главная точка входа для приложения.
+    /// </summary>
+    [STAThread]
+    private static void Main()
     {
-        /// <summary>
-        /// Главная точка входа для приложения.
-        /// </summary>
-        [STAThread]
-        static void Main()
-        {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
 
-            var form = new PotioneerForm();
-            Application.Run(form);
-        }
+        var form = new PotioneerForm();
+        Application.Run(form);
     }
 }

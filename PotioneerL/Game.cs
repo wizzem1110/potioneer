@@ -1,29 +1,57 @@
-﻿using System.Collections.Generic;
+﻿namespace PotioneerL;
 
-namespace PotioneerL
+public class Game
 {
-    public class Game
+    public Game()
     {
-        public List<Herb> HerbsList { get; }
-        public List<Potion> ValidPotionList { get; }
-        public Potion CurrentPotion { get; private set; }
-        public Game()
+        ReagentsList = new List<Reagent>
         {
-            HerbsList = new List<Herb>()
-            {
-                new Herb("belladonna",  (Trait)(-2), (Trait)(-4)),
-                new Herb("daffodil",    (Trait)2, (Trait)4),
-                new Herb("dahlia",      (Trait)1, (Trait)2),
-                new Herb("mandrake",    (Trait)2, (Trait)1),
-                new Herb("thistle",     (Trait)3, (Trait)4),
-                new Herb("wolfsbane",   (Trait)2, (Trait)3),
-            };
+            new(0, "Death", 4, -1),
+            new(1, "Life", 2, 1),
+            new(2, "Warmth", 1, 1),
+            new(3, "Cold", 2, -1),
+            new(4, "Empower", 3, 1)
+        };
 
-            ValidPotionList = new List<Potion>();
+        HerbsList = new List<Herb>
+        {
+            new("belladonna", ReagentsList[0], 1),
+            new("daffodil", ReagentsList[1]),
+            new("dahlia", ReagentsList[2]),
+            new("thistle", ReagentsList[2], -1),
+            new("wolfsbane", ReagentsList[3]),
+            new("mandrake", ReagentsList[4])
+        };
 
-            CurrentPotion = new Potion();
-        }
+        ValidPotions = new Dictionary<(int, int), string>
+        {
+            { (0, 1), "Resurrection" },
+            { (0, 2), "Incineration" },
+            { (0, 4), "Raise Dead" },
+            { (1, 3), "Stasis" },
+            { (2, 3), "Explosion" },
+            { (3, 4), "Eternal Winter" }
+        };
 
-        public void ResetPotion() => CurrentPotion = new Potion();
+        CurrentPotion = new Potion();
+    }
+
+    public List<Herb> HerbsList { get; }
+    private List<Reagent> ReagentsList { get; }
+    private Dictionary<(int, int), string> ValidPotions { get; }
+    public Potion CurrentPotion { get; private set; }
+
+    public void ResetPotion()
+    {
+        CurrentPotion = new Potion();
+    }
+
+    public string ReturnPotion()
+    {
+        var key = CurrentPotion.Finish();
+
+        return key is not null
+            ? ValidPotions[key.Value]
+            : "Blunt";
     }
 }
