@@ -1,0 +1,7 @@
+﻿001 Copper      0   Metal
+002 Zinc        0   Metal
+003 Nickel      0   Metal
+004 Tin         0   Metal
+101 Neusilber   0   Metal
+102 Brass       0   Metal
+103 Bronze      0   Metal

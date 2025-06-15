@@ -8,10 +8,10 @@ internal static class PotioneerMain
     [STAThread]
     private static void Main()
     {
-        Application.EnableVisualStyles();
-        Application.SetCompatibleTextRenderingDefault(false);
-
-        var form = new PotioneerForm();
-        Application.Run(form);
+        // Application.EnableVisualStyles();
+        // Application.SetCompatibleTextRenderingDefault(false);
+        //
+        // var form = new PotioneerForm();
+        // Application.Run(form);
     }
 }
