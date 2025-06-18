@@ -12,27 +12,46 @@ namespace MonoGamePotioneer.Entities
     {
         public Vector2 Position;
 
-        public float Speed;
-
         public Texture2D Texture;
 
         public Rectangle Collision;
 
-        public Entity(Vector2 position, float speed = 0f)
+        public Entity(Vector2 position)
         {
             Position = position;
-            Speed = speed;
+            Collision = new Rectangle(
+                (int)this.Position.X - 50,
+                (int)this.Position.Y - 50,
+                100,
+                100);
         }
 
+        //todo: current logic may cause problems -> can update collision of entity with no collision
         public void AddTexture(Texture2D texture)
         {
             Texture = texture;
-            Collision = new Rectangle((int)this.Position.X - 10, (int)this.Position.Y - 10, 20, 20); //problem w/ collision, every object has same collision
-            //Collision = new Rectangle(
-            //    (int)Position.X - texture.Width / 2,
-            //    (int)Position.Y - texture.Height / 2,
-            //    texture.Width,
-            //    texture.Height);
+            Collision = new Rectangle(
+               (int)Position.X - texture.Width / 2,
+               (int)Position.Y - texture.Height / 2,
+               texture.Width,
+               texture.Height);
+        }
+
+        public void UpdateCollision()
+        {
+            var width = this.Collision.Width;
+            var height = this.Collision.Height;
+
+            this.Collision = new Rectangle(
+               (int)Position.X - width / 2,
+               (int)Position.Y - height / 2,
+               width,
+               height);
+        }
+
+        public void UpdatePosition(Vector2 position)
+        {
+            this.Position = position;
         }
     }
 }

@@ -18,8 +18,9 @@ public class PotioneerMono : Game
     private SpriteBatch _spriteBatch;
     private SpriteFont _font;
 
-    private Entity Player;
-    private IList<Entity> Walls;
+    private Character Player;
+    private IList<Entity> Walls = new List<Entity>();
+    private IList<Projectile> Projectiles = new List<Projectile>();
 
     public PotioneerMono()
     {
@@ -36,18 +37,30 @@ public class PotioneerMono : Game
         var height = _graphics.PreferredBackBufferHeight;
 
         var rnd = new Random();
+        GenerateWalls(4, width, height, rnd);
 
-        this.Walls = new List<Entity>()
-        {
-            new Entity(new Vector2((float)rnd.NextDouble() * width, (float)rnd.NextDouble() * height)),
-            new Entity(new Vector2((float)rnd.NextDouble() * width, (float)rnd.NextDouble() * height)),
-            new Entity(new Vector2((float)rnd.NextDouble() * width, (float)rnd.NextDouble() * height)),
-            new Entity(new Vector2((float)rnd.NextDouble() * width, (float)rnd.NextDouble() * height))
-        };
-
-        this.Player = new Entity(new Vector2(width / 2, height / 2), 500f);
+        this.Player = new Character(new Vector2(100, 100), 500f);
 
         base.Initialize();
+    }
+
+    private void GenerateWalls(int amount, int width, int height, Random rnd)
+    {
+        this.Walls = new List<Entity>();
+        for (var i = 0; i < amount; i++)
+        {
+            this.Walls.Add(
+                new Entity(
+                    new Vector2(
+                        GetRandomWallPosition() * width,
+                        GetRandomWallPosition() * height)));
+        }
+        ;
+
+        float GetRandomWallPosition()
+        {
+            return (float)(rnd.NextDouble() + 1)/2;
+        }
     }
 
     protected override void LoadContent()
@@ -58,7 +71,7 @@ public class PotioneerMono : Game
         {
             Texture2D texture = Content.Load<Texture2D>("grey_wall_ph");
             entity.AddTexture(texture);
-        }
+        } 
 
         this.Player.AddTexture(Content.Load<Texture2D>("player_ph"));
 
@@ -75,31 +88,60 @@ public class PotioneerMono : Game
 
         var keyState = Keyboard.GetState();
 
-        var mover = new EntityController();
         UpdatePlayer(gameTime, keyState);
+
+        if (keyState.IsKeyDown(Keys.M))
+        {
+            var projectile = new Projectile(this.Player.Position, 2000f, default);
+            projectile.AddTexture(Content.Load<Texture2D>("wall_ph"));
+            this.Projectiles.Add(projectile);     
+        }
 
         base.Update(gameTime);
     }
 
     private void UpdatePlayer(GameTime gameTime, KeyboardState keyState)
     {
+        float timeElapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        Direction facingDirection = default;
+
         if (keyState.IsKeyDown(Keys.W) || keyState.IsKeyDown(Keys.Up))
-            this.Player.Position.Y -= this.Player.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+        {
+            this.Player.Move(timeElapsedSeconds, Direction.Up);
+            facingDirection = Direction.Up;
+        }
 
         if (keyState.IsKeyDown(Keys.S) || keyState.IsKeyDown(Keys.Down))
-            this.Player.Position.Y += this.Player.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+        {
+            this.Player.Move(timeElapsedSeconds, Direction.Down);
+            facingDirection = Direction.Down;
+        }
 
         if (keyState.IsKeyDown(Keys.A) || keyState.IsKeyDown(Keys.Left))
-            this.Player.Position.X -= this.Player.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+        {
+            this.Player.Move(timeElapsedSeconds, Direction.Left);
+            facingDirection = Direction.Left;
+        }
 
         if (keyState.IsKeyDown(Keys.D) || keyState.IsKeyDown(Keys.Right))
-            this.Player.Position.X += this.Player.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-        if (this.Walls.Any(obj => obj.Collision.Intersects(this.Player.Collision)))
         {
-            this.Player.Position.X = 100;
-            this.Player.Position.Y = 100;
+            this.Player.Move(timeElapsedSeconds, Direction.Right);
+            facingDirection = Direction.Right;
         }
+
+        this.Player.UpdateCollision();
+
+        foreach (var projectile in Projectiles)
+        {
+            projectile.Move(timeElapsedSeconds);
+            projectile.UpdateCollision();
+        }
+
+        if (CheckCollision())
+            {
+                this.Player.Position.X = 0;
+                this.Player.Position.Y = 0;
+            }
 
         if (this.Player.Position.X > _graphics.PreferredBackBufferWidth - this.Player.Texture.Width / 2)
             this.Player.Position.X = _graphics.PreferredBackBufferWidth - this.Player.Texture.Width / 2;
@@ -110,6 +152,19 @@ public class PotioneerMono : Game
             this.Player.Position.Y = _graphics.PreferredBackBufferHeight - this.Player.Texture.Height / 2;
         else if (this.Player.Position.Y < this.Player.Texture.Height / 2)
             this.Player.Position.Y = this.Player.Texture.Height / 2;
+    }
+
+    private bool CheckCollision()
+    {
+        foreach (var wall in this.Walls)
+        {
+            if (wall.Collision.Intersects(this.Player.Collision))
+            {
+                return true;
+            }
+        }
+
+        return this.Walls.Any(obj => obj.Collision.Intersects(this.Player.Collision));
     }
 
     protected override void Draw(GameTime gameTime)
