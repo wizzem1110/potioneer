@@ -16,8 +16,6 @@ public class PotioneerMono : Game
 {
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
-    private SpriteFont _font;
-
     private Character Player;
     private IList<Entity> Walls = new List<Entity>();
     private IList<Projectile> Projectiles = new List<Projectile>();
@@ -103,30 +101,25 @@ public class PotioneerMono : Game
     private void UpdatePlayer(GameTime gameTime, KeyboardState keyState)
     {
         float timeElapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
-        Direction facingDirection = default;
 
         if (keyState.IsKeyDown(Keys.W) || keyState.IsKeyDown(Keys.Up))
         {
             this.Player.Move(timeElapsedSeconds, Direction.Up);
-            facingDirection = Direction.Up;
         }
 
         if (keyState.IsKeyDown(Keys.S) || keyState.IsKeyDown(Keys.Down))
         {
             this.Player.Move(timeElapsedSeconds, Direction.Down);
-            facingDirection = Direction.Down;
         }
 
         if (keyState.IsKeyDown(Keys.A) || keyState.IsKeyDown(Keys.Left))
         {
             this.Player.Move(timeElapsedSeconds, Direction.Left);
-            facingDirection = Direction.Left;
         }
 
         if (keyState.IsKeyDown(Keys.D) || keyState.IsKeyDown(Keys.Right))
         {
             this.Player.Move(timeElapsedSeconds, Direction.Right);
-            facingDirection = Direction.Right;
         }
 
         this.Player.UpdateCollision();
